@@ -3,5 +3,23 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Kevin Wang <kwangsan@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "twit": "^2.2.11"
+  },
+  "devDependencies": {
+    "@types/twit": "^2.2.24",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.1",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "tslint": "^6.1.2",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.0.0-dev.20200512"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev --no-notify --respawn --transpileOnly ./src",
+    "format": "prettier --write src/**/*.ts",
+    "lint": "tslint -p tsconfig.json"
+  }
 }
