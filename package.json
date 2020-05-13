@@ -5,7 +5,10 @@
   "author": "Kevin Wang <kwangsan@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "twit": "^2.2.11"
+    "aws-sdk": "^2.675.0",
+    "dotenv": "^8.2.0",
+    "twit": "^2.2.11",
+    "twitter-autohook": "^1.6.0"
   },
   "devDependencies": {
     "@types/twit": "^2.2.24",
