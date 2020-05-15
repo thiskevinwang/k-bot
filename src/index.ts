@@ -1,40 +1,21 @@
 import Twit from "twit"
 import { config } from "dotenv"
 import { Autohook } from "twitter-autohook"
-import fs from "fs"
-
-// import { createMessage } from "./createMessage"
 
 config()
 // sanity check
 // console.log(process.env.ACCESS_TOKEN)
 
-// const T = new Twit({
-//   consumer_key: process.env.API_KEY!,
-//   consumer_secret: process.env.API_SECRET_KEY!,
-//   access_token: process.env.ACCESS_TOKEN,
-//   access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-//   timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-//   strictSSL: true, // optional - requires SSL certificates to be valid.
-// })
-// trump user_id: `25073877`
-// screen_name: 'realDonaldTrump'
-// var stream = T.stream("statuses/filter", {
-//   follow: ["25073877"],
-// })
+const T = new Twit({
+  consumer_key: process.env.API_KEY!,
+  consumer_secret: process.env.API_SECRET_KEY!,
+  access_token: process.env.APP_ACCESS_TOKEN,
+  access_token_secret: process.env.APP_ACCESS_TOKEN_SECRET,
+  timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+  strictSSL: true, // optional - requires SSL certificates to be valid.
+})
 
-// stream.on("tweet", function (tweet) {
-//   console.log(tweet)
-//   // createMessage?.({ tweet })
-// })
-
-/**
- * Permissions need to be
- * Read, write, and Direct Messages
- * @see https://developer.twitter.com/en/apps/16078846
- * @see https://twittercommunity.com/t/getting-error-code-348-while-trying-to-add-subscription/101796/6
- */
-;(async start => {
+const main = async () => {
   try {
     const webhook = new Autohook({
       token: process.env.APP_ACCESS_TOKEN,
@@ -42,38 +23,39 @@ config()
       consumer_key: process.env.API_KEY,
       consumer_secret: process.env.API_SECRET_KEY,
       env: "sandbox",
+      port: 80,
     })
 
     // Removes existing webhooks
     await webhook.removeWebhooks()
+    console.log("__removed")
 
     // Starts a server and adds a new webhook
     await webhook.start()
+    console.log("__started")
 
     // Subscribes to your own user's activity
     await webhook.subscribe({
       oauth_token: process.env.APP_ACCESS_TOKEN,
       oauth_token_secret: process.env.APP_ACCESS_TOKEN_SECRET,
     })
+    console.log("__subscribed")
 
-    /**
-     * https://developer.twitter.com/en/docs/accounts-and-users/subscribe-account-activity/guides/account-activity-data-objects
-     */
     webhook.on("event", async event => {
-      console.log("You received an event!", event)
-      console.log(event)
-      let data = JSON.stringify(event)
-      // fs.writeFileSync(`${new Date().getTime()}.json`, data)
+      const screenName = event?.follow_events?.[0]?.source?.screen_name
+
+      if (screenName && screenName !== "thekevinwang") {
+        T.post("statuses/update", {
+          status: `🤖 Meep. Thanks for following me, @${screenName}! 🎈🎉`,
+        })
+      }
     })
   } catch (e) {
     // Display the error and quit
-    console.error(e)
+    console.error("$$$", e)
+    console.log({ ...e })
     process.exit(1)
   }
-})()
-
-interface Evvent {
-  for_user_id: string
-  tweet_create_events?: {}[]
-  tweet_delete_events?: { status: {}; timestamp_ms: string }[]
 }
+
+main()
